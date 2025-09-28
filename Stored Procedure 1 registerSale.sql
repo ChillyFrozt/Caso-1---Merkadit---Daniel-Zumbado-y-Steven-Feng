@@ -37,7 +37,6 @@ BEGIN
 
     SELECT c.comercioid
       INTO v_comercioid
-      FROM `comercio` c
       FROM comercio c
      WHERE c.comercioName = p_comercioName
      LIMIT 1;
@@ -47,7 +46,6 @@ BEGIN
 
     SELECT p.productoid, COALESCE(p.productoIVA, 0)
       INTO v_productoid, v_iva
-      FROM `productos` p
       FROM productos p
      WHERE p.comercioid = v_comercioid
        AND p.productoName = p_productoName
@@ -59,7 +57,6 @@ BEGIN
 
     SELECT mp.metodoDePagoid
       INTO v_metodoPagoId
-      FROM `metodosDePago` mp
       FROM metodosDePago mp
      WHERE mp.metodoDePagoName = p_medio_pago_name
      LIMIT 1;
@@ -76,12 +73,11 @@ BEGIN
 
     IF v_precioUnit IS NULL THEN
         SELECT productoPrecio INTO v_precioUnit
-          FROM `productos`
           FROM productos
          WHERE productoid = v_productoid;
     END IF;
 
-    IF p_monto_pagado IS NOT NULL AND p_cantidad > 0 AND (ROUND(p_monto_pagado / p_cantidad,2) <> v_precioUnit) THEN
+    IF p_monto_pagado IS NOT NULL AND p_cantidad > 0
        AND (ROUND(p_monto_pagado / p_cantidad,2) <> v_precioUnit) THEN
         SET v_precioUnit = ROUND(p_monto_pagado / p_cantidad, 2);
     END IF;
@@ -97,36 +93,37 @@ BEGIN
         END IF;
     END IF;
 
-    SET v_total = ROUND((v_subtotal - v_descuento_monto) * (1 + (v_iva/100)), 2);
     SET v_total = ROUND((v_subtotal - v_descuento_monto) * (1 + (COALESCE(v_iva,0)/100)), 2);
 
-    VALUES (NOW(), v_total, p_numero_factura, v_descuento_monto, v_iva, v_metodoPagoId, NULL, v_subtotal, NOW(), NOW(), v_comercioid);
+    INSERT INTO facturas
+      (postTime, total, numeroFactura, descuento, ivaAplicado, metodosDePagoid, usuarioid, subtotal, created_at, updated_at, comercioid)
+    VALUES
       (NOW(), v_total, p_numero_factura, v_descuento_monto, v_iva, v_metodoPagoId, NULL, v_subtotal, NOW(), NOW(), v_comercioid);
     SET v_facturaid = LAST_INSERT_ID();
 
-    INSERT INTO `detallesfactura` (facturaid, productoid, cantidad, subtotal, precioUnitario, deleted)
     INSERT INTO detallesfactura (facturaid, productoid, cantidad, subtotal, precioUnitario, deleted)
     VALUES (v_facturaid, v_productoid, p_cantidad, v_subtotal, v_precioUnit, b'0');
 
-    UPDATE `productos`
     UPDATE productos
        SET productoCantidad = productoCantidad - p_cantidad,
            updated_at       = NOW()
      WHERE productoid = v_productoid;
 
-    SELECT tt.tipoTransaccionid
     SELECT tipoTransaccionid
       INTO v_tipoTransVenta
-     WHERE tt.tipoTransaccionName = 'VENTA'
+      FROM tipoTransacciones
      WHERE tipoTransaccionName = 'VENTA'
      LIMIT 1;
     IF v_tipoTransVenta IS NULL THEN
-        INSERT INTO `tipoTransacciones` (tipoTransaccionName, deleted) VALUES ('VENTA', b'0');
         INSERT INTO tipoTransacciones (tipoTransaccionName, deleted) VALUES ('VENTA', b'0');
         SET v_tipoTransVenta = LAST_INSERT_ID();
     END IF;
 
-            p_computer, p_usuario_app, v_checksum);
+    INSERT INTO transacciones (tipoTransaccionesid, comercioid, monto, descripcion, posttime, deleted)
+    VALUES (
+        v_tipoTransVenta, v_comercioid, v_total,
+        CONCAT('Venta #', IFNULL(p_numero_factura,0), ' cliente:', IFNULL(p_cliente,'')),
+        NOW(), b'0'
     );
 
     COMMIT;

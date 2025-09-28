@@ -1,8 +1,18 @@
 
-
 import pymysql
 from contextlib import contextmanager
 from config import settings
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+DATABASE_URL = "postgresql://stevenfeng@localhost:5432/merkadit_db"
+
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 def get_connection():
     return pymysql.connect(

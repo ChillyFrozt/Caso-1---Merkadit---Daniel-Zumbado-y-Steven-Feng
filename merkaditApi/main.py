@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from rutas import sales, commerce, users, reports
 
+
 app = FastAPI(title="Merkadit API")
 
 app.include_router(sales.router, prefix= "/sales", tags=["Sales"])

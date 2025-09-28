@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from rutas import sales, commerce, users, reports, products
-
+from rutas import sales_sp
 
 app = FastAPI(title="Merkadit API")
 
@@ -9,6 +9,7 @@ app.include_router(commerce.router, prefix="/commerce", tags=["Commerce"])
 app.include_router(users.router,    prefix="/users",    tags=["Users"])
 app.include_router(reports.router,  prefix="/reports",  tags=["Reports"])
 app.include_router(products.router, prefix="/products", tags=["Products"])
+app.include_router(sales_sp.router, tags=["Settlements & Sales SP"])
 
 @app.get("/")
 def root():

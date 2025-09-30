@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter()  # <-- esto es lo que está faltando
+router = APIRouter()  
 
 @router.get("/test")
 def test_sales():

@@ -1,5 +1,4 @@
-# merkaditApi/repositories/products_repository.py
-print(">> Cargando repositories/products_repository.py")  # debug
+print(">> Cargando repositories/products_repository.py") 
 
 from typing import List, Optional, Dict, Any
 

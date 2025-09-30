@@ -1,4 +1,3 @@
-
 import pymysql
 from contextlib import contextmanager
 from config import settings
@@ -6,13 +5,16 @@ from config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE_URL = "postgresql://stevenfeng@localhost:5432/merkadit_db"
+SQLALCHEMY_URL = (
+    f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+    f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
+    f"?charset={settings.MYSQL_CHARSET}"
+)
 
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
+engine = create_engine(SQLALCHEMY_URL, pool_pre_ping=True, future=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
 Base = declarative_base()
+
 
 def get_connection():
     return pymysql.connect(
@@ -23,7 +25,7 @@ def get_connection():
         database=settings.MYSQL_DB,
         charset=settings.MYSQL_CHARSET,
         cursorclass=pymysql.cursors.DictCursor,
-        autocommit=False,      
+        autocommit=False,
     )
 
 @contextmanager
@@ -49,4 +51,5 @@ def get_db():
         raise
     finally:
         conn.close()
+
 

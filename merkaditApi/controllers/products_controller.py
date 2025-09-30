@@ -1,4 +1,3 @@
-# merkaditApi/controllers/products_controller.py
 print(">> Cargando controllers/products_controller.py")  # debug
 
 from services.products_service import ProductsService

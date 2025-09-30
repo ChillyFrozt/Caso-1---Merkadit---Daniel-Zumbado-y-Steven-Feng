@@ -11,7 +11,7 @@ class Facturas(Base):
     posttime = Column(DateTime, server_default=func.now(),nullable=False)
     numeroFactura = Column(Integer, nullable=False)
     descuento = Column(DECIMAL(10,2),nullable=False)
-    ivaAplicado = Column(DECIMAL(5,2),nullable=False)
+    ivaTotal = Column(DECIMAL(12,2),nullable=False)
     metodoDePagoid = Column(Integer, ForeignKey("metodosDePago.metodoDePagoid"))
     usuarioid = Column(Integer,ForeignKey("usuarios.usuarioid"),nullable=False)
     subtotal = Column(DECIMAL(12,2),nullable=False)
@@ -24,7 +24,7 @@ class MetodosDePago(Base):
     metodoDePagoid = Column(Integer,primary_key=True, autoincrement=True, nullable=False)
     metodoDePagoName = Column(VARCHAR(45), nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
-    
+
 class DetallesFactura(Base):
     __tablename__="detallesFactura"
     detalleFacturaid = Column(Integer, primary_key= True,nullable=False, autoincrement= True)
@@ -34,6 +34,7 @@ class DetallesFactura(Base):
     subtotal = Column(DECIMAL(12,2),nullable=False)
     precioUnitario = Column(DECIMAL(12,2), nullable=False)
     deleted = Column(Boolean,default=False,nullable=False)
+    ivaAplicado = Column(DECIMAL(12,2), nullable=False)
 
 class Productos(Base):
     __tablename__ ="productos"
@@ -127,6 +128,8 @@ class MercadoPorBuildings(Base):
     mercadoPorBuildingsid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     mercadoid = Column(Integer, ForeignKey("mercados.mercadoid"))
     buildingid = Column(Integer, ForeignKey("buildings.buildingid"))
+    deleted = Column(Boolean, default=False, nullable=False)
+    postTime = Column(DateTime, nullable=False)
 
 class Usuarios(Base):
     __tablename__ = "usuarios"
@@ -235,13 +238,6 @@ class Kioskos(Base):
     created_at = Column(DateTime, nullable=False)
     mercadoid = Column(Integer, ForeignKey("mercados.mercadoid"), nullable=False)
 
-class Addresses(Base):
-    __tablename__ = "addresses"
-    addressid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    addressName = Column(VARCHAR(150), nullable=False)
-    cityid = Column(Integer, ForeignKey("cities.cityid"), nullable=False)
-    geolocation = Column(Geometry(geometry_type='POINT', strid = 4326), nullable=False)
-
 class PermisoPorRol(Base):
     __tablename__ = "permisoPorRol"
     permisoPorRolid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -281,6 +277,14 @@ class Contracts(Base):
     ownerid = Column(Integer, ForeignKey("owners.ownerid"), nullable=False)
     comercioid = Column(Integer, ForeignKey("comercios.comercioid"), nullable=False)
 
+class ContractsKioskos(Base):
+    __tablename__ = "contractsKioskos"
+    contractKiosko = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    contractid = Column(Integer, ForeignKey("contracts.contractid"))
+    kioskoid = Column(Integer, ForeignKey("kioskos.kioskoid"), nullable=False)
+    deleted = Column(Boolean, default=False, nullable=False)
+    posttime = Column(DateTime, nullable=False)
+
 class PermisoPorUsuraio(Base):
     __tablename__ = "permisoPorUsuario"
     permisoPorUusarioid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -288,7 +292,20 @@ class PermisoPorUsuraio(Base):
     usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
     created_at = Column(DateTime, nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
+    postTime = Column(DateTime, nullable=False)
 
+class Addresses(Base):
+    __tablename__ = "addresses"
+    addressid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    addressName = Column(VARCHAR(150), nullable=False)
+    cityid = Column(Integer, ForeignKey("cities.cityid"), nullable=False)
+    geolocation = Column(Geometry(geometry_type='POINT', strid = 4326), nullable=False)
+    codigoPostal = Column(VARCHAR(20), nullable=False)
+    direccion1 = Column(VARCHAR(45), nullable=False)
+    direccion2 = Column(VARCHAR(45))
+    deleted = Column(Boolean,default=False, nullable=False)
+    postTime = Column(DateTime, nullable=False)
+    
 class Cities(Base):
     __tablename__ = "cities"
     cityid = Column(Integer, primary_key= True, autoincrement=True, nullable=False)

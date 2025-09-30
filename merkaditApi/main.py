@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from rutas import sales, commerce, users, reports, products
 from rutas import sales_sp
+from fastapi import APIRouter, HTTPException
+import json
+from database import db_cursor
+from schemas import SaleIn
 
+router = APIRouter()
 app = FastAPI(title="Merkadit API")
 
 app.include_router(sales.router,    prefix="/sales",    tags=["Sales"])
@@ -18,3 +23,32 @@ def root():
 import pprint
 print(">>> RUTAS REGISTRADAS:")
 pprint.pprint([ (r.path, [m for m in r.methods]) for r in app.routes ])
+
+@router.post("/register-sale")
+def register_sale(sale: SaleIn):
+    try:
+        with db_cursor() as (conn, cursor):
+            cursor.execute(
+                """
+                CALL registerSale(
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                )
+                """,
+                (
+                    sale.productoName,
+                    sale.comercioName,
+                    sale.cantidad,
+                    sale.monto_pagado,
+                    sale.medio_pago_name,
+                    json.dumps(sale.confirmaciones_pago),
+                    json.dumps(sale.numeros_referencia),
+                    sale.numero_factura,
+                    sale.cliente,  # 🔹 este es el parámetro p_cliente
+                    json.dumps(sale.descuentos_aplic) if sale.descuentos_aplic else None
+                )
+            )
+            result = cursor.fetchone()  # si el SP no retorna nada, puedes eliminar esto
+            return {"status": "success", "data": result}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

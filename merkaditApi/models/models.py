@@ -5,6 +5,22 @@ from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+class Owners(Base):
+    __tablename__ = "owners"
+    ownerid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
+    enabled = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    deleted_at = Column(DateTime, nullable=False)
+    deleted = Column(Boolean, nullable=False, default=False)
+
+class MetodosDePago(Base):
+    __tablename__ = "metodosDePago"
+    metodoDePagoid = Column(Integer,primary_key=True, autoincrement=True, nullable=False)
+    metodoDePagoName = Column(VARCHAR(45), nullable=False)
+    deleted = Column(Boolean, default=False, nullable=False)
+
 class Facturas(Base):
     __tablename__="facturas"
     facturaid = Column(Integer, primary_key= True,nullable=False, autoincrement= True)
@@ -19,11 +35,6 @@ class Facturas(Base):
     updated_at = Column(DateTime, nullable=False)
     comercioid = Column(Integer,ForeignKey("comercios.comercioid"), nullable=False)
 
-class MetodosDePago(Base):
-    __tablename__ = "metodosDePago"
-    metodoDePagoid = Column(Integer,primary_key=True, autoincrement=True, nullable=False)
-    metodoDePagoName = Column(VARCHAR(45), nullable=False)
-    deleted = Column(Boolean, default=False, nullable=False)
 
 class DetallesFactura(Base):
     __tablename__="detallesFactura"
@@ -142,15 +153,6 @@ class Usuarios(Base):
     deleted_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
-class Owner(Base):
-    __tablename__ = "owner"
-    ownerid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
-    enabled = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
-    deleted = Column(Boolean, nullable=False, default=False)
 
 class Inversiones(Base):
     __tablename__ = "inversiones"
@@ -175,7 +177,7 @@ class Comercios(Base):
 class EstadoComercio(Base):
     __tablename__ = "estadoComercios"
     estadoComercioid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    estadoComercioName = Column(VARCHAR)
+    estadoComercioName = Column(VARCHAR(100), nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
 
 class TipoComercios(Base):
@@ -244,7 +246,7 @@ class PermisoPorRol(Base):
     rolid = Column(Integer, ForeignKey("roles.rolid"), nullable=False)
     permisoid = Column(Integer, ForeignKey("permisos.permisoid"), nullable=False)
     created_at = Column(DateTime,nullable=False)
-    deleted = Column(Integer, Boolean, default=False, nullable=False)
+    deleted = Column(Boolean, default=False, nullable=False)
     deleted_at = Column(DateTime)
 
 class Permisos(Base):
@@ -299,13 +301,13 @@ class Addresses(Base):
     addressid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     addressName = Column(VARCHAR(150), nullable=False)
     cityid = Column(Integer, ForeignKey("cities.cityid"), nullable=False)
-    geolocation = Column(Geometry(geometry_type='POINT', strid = 4326), nullable=False)
+    geolocation = Column(Geometry(geometry_type='POINT', srid = 4326), nullable=False)
     codigoPostal = Column(VARCHAR(20), nullable=False)
     direccion1 = Column(VARCHAR(45), nullable=False)
     direccion2 = Column(VARCHAR(45))
     deleted = Column(Boolean,default=False, nullable=False)
     postTime = Column(DateTime, nullable=False)
-    
+
 class Cities(Base):
     __tablename__ = "cities"
     cityid = Column(Integer, primary_key= True, autoincrement=True, nullable=False)

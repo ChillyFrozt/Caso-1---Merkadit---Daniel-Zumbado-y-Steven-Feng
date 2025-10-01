@@ -47,11 +47,11 @@ def register_sale(sale: SaleIn):
                     json.dumps(sale.confirmaciones_pago),
                     json.dumps(sale.numeros_referencia),
                     sale.numero_factura,
-                    sale.cliente,  # 🔹 este es el parámetro p_cliente
+                    sale.cliente,  
                     json.dumps(sale.descuentos_aplic) if sale.descuentos_aplic else None
                 )
             )
-            result = cursor.fetchone()  # si el SP no retorna nada, puedes eliminar esto
+            result = cursor.fetchone()  
             return {"status": "success", "data": result}
 
     except Exception as e:

@@ -1,4 +1,3 @@
-# products_service.py
 from typing import List, Dict, Any
 from ..repositories.products_repository import ProductsRepository
 from ..repositories.sales_repository    import SalesRepository

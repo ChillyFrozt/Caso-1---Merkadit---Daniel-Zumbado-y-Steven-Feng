@@ -1,11 +1,9 @@
-# sales_service.py
 from ..repositories.products_repository import ProductsRepository
 from ..repositories.sales_repository    import SalesRepository
 
 
 class SalesService:
     def __init__(self, repo: SalesRepository | None = None):
-        # el repo usa métodos estáticos; aceptar instancia también está bien
         self.repo = repo or SalesRepository()
 
     def register_sale(self, db, payload: dict):

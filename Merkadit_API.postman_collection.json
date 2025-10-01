@@ -1,0 +1,229 @@
+{
+    "info": {
+        "name": "Merkadit API",
+        "_postman_id": "e5f5e4cf-5fd4-47a7-bc2c-merkadit",
+        "description": "Pruebas de endpoints CRUD y Stored Procedures (registerSale, settleCommerce). Usa la variable {{base_url}}.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000"
+        }
+    ],
+    "item": [
+        {
+            "name": "Sanity",
+            "item": [
+                {
+                    "name": "GET /",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "pm.test('ok:true', () => pm.response.json().ok === true);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "POST /products  (create)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productoName\": \"Coca Cola 600ml\",\n  \"productoPrecio\": 900.5,\n  \"productoCantidad\": 50\n}"
+                        },
+                        "url": "{{base_url}}/products"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('201 Created', () => pm.response.code === 201);",
+                                    "const j = pm.response.json();",
+                                    "pm.test('Tiene productoId', () => typeof j.productoId === 'number');",
+                                    "// Guarda ID para los siguientes requests",
+                                    "pm.collectionVariables.set('product_id', j.productoId);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /products (list)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/products"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "const arr = pm.response.json();",
+                                    "pm.test('Lista > 0', () => Array.isArray(arr) && arr.length >= 1);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /products/{id}",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/products/{{product_id}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "const j = pm.response.json();",
+                                    "pm.test('IDs concuerdan', () => j.productoId === Number(pm.collectionVariables.get('product_id')));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /products/{id}  (update)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productoPrecio\": 875.0\n}"
+                        },
+                        "url": "{{base_url}}/products/{{product_id}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "pm.test('Precio actualizado', () => pm.response.json().productoPrecio === 875.0);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "DELETE /products/{id}",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{base_url}}/products/{{product_id}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('204 No Content', () => pm.response.code === 204);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Stored Procedures",
+            "item": [
+                {
+                    "name": "POST /sales/register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productoName\": \"Coca Cola 600ml\",\n  \"comercioName\": \"Pulpería La Esquina\",\n  \"cantidad\": 2,\n  \"monto_pagado\": 1800.0,\n  \"medio_pago_name\": \"EFECTIVO\",\n  \"confirmaciones_pago\": [{\"by\":\"cajero\",\"ok\":true}],\n  \"numeros_referencia\": [\"N/A\"],\n  \"numero_factura\": \"F-000123\",\n  \"cliente\": \"Juan Perez\",\n  \"descuentos_aplic\": {\"promo\":\"2x1\"},\n  \"usuario_app\": \"apiuser\",\n  \"computer\": \"apihost\"\n}"
+                        },
+                        "url": "{{base_url}}/sales/register"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "const j = pm.response.json();",
+                                    "pm.test('status ok', () => j.status === 'ok' || j.result === 'ok');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /commerce/settle",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"comercioName\": \"Pulpería La Esquina\",\n  \"localName\": \"Local A-12\",\n  \"usuario_app\": \"apiuser\",\n  \"computer\": \"apihost\"\n}"
+                        },
+                        "url": "{{base_url}}/commerce/settle"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('200 OK', () => pm.response.code === 200);",
+                                    "const j = pm.response.json();",
+                                    "pm.test('status ok', () => j.status === 'ok' || j.result === 'ok');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from database import get_db
-from controllers.sales_controller import SalesController
+from ..database import get_db
+from ..controllers.sales_controller import SalesController
 
 router = APIRouter()
 
@@ -17,3 +17,4 @@ def settle_commerce(payload: dict, db = Depends(get_db)):
         return SalesController().settle_commerce(db, payload)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+

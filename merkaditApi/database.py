@@ -1,6 +1,6 @@
 import pymysql
 from contextlib import contextmanager
-from config import settings
+from .config import settings
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker

@@ -10,15 +10,15 @@ SELECT
     (cf.fee * 100) AS porcentaje_dueno,
     SUM(f.total * cf.fee) AS monto_dueno,
     con.montoBase AS renta_a_pagar
-FROM caso1.facturas f
-JOIN caso1.detallesfactura df ON df.facturaid = f.facturaid
-JOIN caso1.productos p ON p.productoid = df.productoid
-JOIN caso1.comercio c ON c.comercioid = f.comercioid
-JOIN caso1.contracts con ON con.contractid = c.contractid
-JOIN caso1.kioskos k ON k.kioskoid = con.kioskoid
-JOIN caso1.mercados m ON m.mercadoid = k.mercadoid
-JOIN caso1.buildings b ON b.buildingid = m.buildingid
-JOIN caso1.contractscategoriafee cf 
+FROM merkadit_db.facturas f
+JOIN merkadit_db.detallesFactura df ON df.facturaid = f.facturaid
+JOIN merkadit_db.productos p ON p.productoid = df.productoid
+JOIN merkadit_db.comercios c ON c.comercioid = f.comercioid
+JOIN merkadit_db.contracts con ON con.contractid = c.contractid
+JOIN merkadit_db.kioskos k ON k.kioskoid = con.kioskoid
+JOIN merkadit_db.mercados m ON m.mercadoid = k.mercadoid
+JOIN merkadit_db.buildings b ON b.buildingid = m.buildingid
+JOIN merkadit_db.contractsCategoriaFee cf 
     ON cf.contractid = con.contractid 
    AND cf.categoriaProductoid = p.categoriaProductoid
 WHERE MONTH(f.postTime) = MONTH(CURDATE()) 

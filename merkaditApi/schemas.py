@@ -34,3 +34,14 @@ class ProductoRead(ProductoBase):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+class SaleIn(BaseModel):
+    nombreProducto: str
+    nombreTienda: str
+    cantidad: float
+    cantidadPagada: float
+    metodoPago: str
+    confirmacionesPago: str
+    numeroReferencia: str
+    numerFactura: int
+    cliente: str
+    descuentoAplicado: Optional[float] = 0.0

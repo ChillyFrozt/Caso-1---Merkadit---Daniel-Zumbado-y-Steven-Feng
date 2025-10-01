@@ -10,9 +10,9 @@ class Owners(Base):
     ownerid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
     enabled = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=False, server_default=func.now())
     deleted = Column(Boolean, nullable=False, default=False)
 
 class MetodosDePago(Base):
@@ -23,6 +23,7 @@ class MetodosDePago(Base):
 
 class Facturas(Base):
     __tablename__="facturas"
+    total = Column(DECIMAL(12,2),nullable=False)
     facturaid = Column(Integer, primary_key= True,nullable=False, autoincrement= True)
     posttime = Column(DateTime, server_default=func.now(),nullable=False)
     numeroFactura = Column(Integer, nullable=False)
@@ -62,11 +63,12 @@ class Productos(Base):
     created_at = Column(DateTime, server_default=func.now(),nullable=False)
     updated_at = Column(DateTime, server_default=func.now(),nullable=False)
     updated_by = Column(Integer, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class EstadoCuentas(Base):
     __tablename__ = "estadoCuentas"
     estadoCuentaid = Column(Integer, primary_key= True, nullable=False, autoincrement= True)
-    deleted = Column(Boolean, default=False)
+    deleted = Column(Boolean, default=False,nullable=False)
 
 class ContractsCategoriaFee(Base):
     __tablename__ = "contractsCategoriaFee"
@@ -85,7 +87,7 @@ class Mercados(Base):
     created_at = Column(DateTime, server_default=func.now(),nullable=False)
     created_by = Column(Integer, nullable=False)
     addressid = Column(Integer, ForeignKey("addresses.addressid"), nullable=False)
-    tipoMercado = Column(Integer, ForeignKey("tipoMercados.tipoMercadoid"),nullable=False)
+    tipoMercadoid = Column(Integer, ForeignKey("tipoMercados.tipoMercadoid"),nullable=False)
     maxAncho = Column(DECIMAL(8,2), nullable=False)
     maxLargo = Column(DECIMAL(8,2), nullable=False)
     buildingid = Column(Integer,ForeignKey("buildings.buildingid"),nullable=False)
@@ -112,14 +114,14 @@ class Transacciones(Base):
     comercioid = Column(Integer, ForeignKey("comercios.comercioid"))
     monto = Column(DECIMAL(12,2),nullable=False)
     descripcion = Column(VARCHAR(200), nullable=False)
-    posttime = Column(DateTime,nullable=False)
+    posttime = Column(DateTime,nullable=False, server_default=func.now())
     deleted = Column(Boolean, default=False,nullable=False)
 
 class PrecioProductos(Base):
     __tablename__ = "precioProductos"
     precioProductoid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     precio = Column(DECIMAL(10,2), nullable=False)
-    posttime = Column(DateTime,nullable=False)
+    posttime = Column(DateTime,nullable=False, server_default=func.now())
     productoid = Column(Integer, ForeignKey("productos.productoid"), nullable=False)
 
 class Buildings(Base):
@@ -127,10 +129,10 @@ class Buildings(Base):
     buildingid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     buildingName = Column(VARCHAR(100), nullable=False)
     addressid = Column(Integer, ForeignKey("addresses.addressid"), nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    created_by = Column(Integer, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    created_by = Column(Integer, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=False, server_default=func.now())
     maxAncho = Column(DECIMAL(8,2), nullable=False)
     maxLargo = Column(DECIMAL(8,2), nullable=False)
 
@@ -140,18 +142,18 @@ class MercadoPorBuildings(Base):
     mercadoid = Column(Integer, ForeignKey("mercados.mercadoid"))
     buildingid = Column(Integer, ForeignKey("buildings.buildingid"))
     deleted = Column(Boolean, default=False, nullable=False)
-    postTime = Column(DateTime, nullable=False)
+    postTime = Column(DateTime, nullable=False, server_default=func.now())
 
 class Usuarios(Base):
     __tablename__ = "usuarios"
     usuarioid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     usuarioName = Column(VARCHAR(45), nullable=False)
-    usuarioPassword = VARBINARY(128)
+    usuarioPassword = Column(VARBINARY(128), nullable=False)
     enabled = Column(Boolean, nullable=False, default=True)
     deleted = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=False, default=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now())
 
 
 class Inversiones(Base):
@@ -164,15 +166,16 @@ class Inversiones(Base):
 
 class Comercios(Base):
     __tablename__ = "comercios"
+    comercioName = Column(VARCHAR(200),nullable=False)
     comercioid = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False,server_default=func.now())
     created_by = Column(Integer,nullable=False)
-    tipoComercio = Column(Integer, ForeignKey("tipoComercios.tipoComercioid"), nullable=False)
+    tipoComercioid = Column(Integer, ForeignKey("tipoComercios.tipoComercioid"), nullable=False)
     cedulaJuridica = Column(Integer, nullable=False)
-    razonSocial = Column(Integer, nullable=False)
+    razonSocial = Column(VARCHAR(200), nullable=False)
     contractid = Column(Integer, ForeignKey("contracts.contractid"))
     deleted = Column(Boolean, default=False, nullable=False)
-    estadoComercio = Column(Integer, ForeignKey("estadoComercios.estadoComercioid"))
+    estadoComercioid = Column(Integer, ForeignKey("estadoComercios.estadoComercioid"))
 
 class EstadoComercio(Base):
     __tablename__ = "estadoComercios"
@@ -195,8 +198,6 @@ class comercioUsuarios(Base):
     comercioid = Column(Integer, ForeignKey("comercios.comercioid"),nullable=False)
     rolid = Column(Integer, ForeignKey("roles.rolid"),nullable=False)
     usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
-    comercio = relationship("Comercios",back_populates="usuarios")
-    usuario = relationship("Usuario", back_populates="comercios")
     deleted = Column(Boolean, default=False, nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
 
@@ -207,8 +208,8 @@ class UsuarioPorRol(Base):
     valid_from = Column(Date, nullable=False)
     valid_to = Column(Date, nullable=False)
     deleted = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=False, server_default=func.now())
 
 class TipoMercados(Base):
     __tablename__ = "tipoMercados"
@@ -216,7 +217,7 @@ class TipoMercados(Base):
     tipoMercadoName = Column(VARCHAR(45), nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
 
-class CategoriaKiokos(Base):
+class CategoriaKioskos(Base):
     __tablename__ = "categoriaKioskos"
     categoriaKioskoid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     categoriaKioskoName = Column(VARCHAR(45), nullable=False)
@@ -237,7 +238,7 @@ class Kioskos(Base):
     tipoKioskoid = Column(Integer,ForeignKey("tipoKioskos.tipoKioskoid"), nullable=False)
     ancho = Column(DECIMAL(6,2), nullable=False)
     largo = Column(DECIMAL(6,2), nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
     mercadoid = Column(Integer, ForeignKey("mercados.mercadoid"), nullable=False)
 
 class PermisoPorRol(Base):
@@ -245,9 +246,9 @@ class PermisoPorRol(Base):
     permisoPorRolid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     rolid = Column(Integer, ForeignKey("roles.rolid"), nullable=False)
     permisoid = Column(Integer, ForeignKey("permisos.permisoid"), nullable=False)
-    created_at = Column(DateTime,nullable=False)
+    created_at = Column(DateTime,nullable=False, server_default=func.now())
     deleted = Column(Boolean, default=False, nullable=False)
-    deleted_at = Column(DateTime)
+    deleted_at = Column(DateTime, nullable=False, server_default=func.now())
 
 class Permisos(Base):
     __tablename__ = "permisos"
@@ -261,19 +262,19 @@ class Roles(Base):
     nombreRol = Column(VARCHAR(45), nullable=False)
     enabled = Column(Boolean, default=True, nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    deleted_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now())
 
 
 class Contracts(Base):
     __tablename__ = "contracts"
     contractid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    posttime = Column(DateTime, nullable=False)
+    posttime = Column(DateTime, nullable=False, server_default=func.now())
     fechaCobro = Column(DateTime, nullable=False)
     montoBase = Column(DECIMAL(12,2), nullable=False)
     fechaFinal = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False,server_default=func.now())
     created_by = Column(Integer, nullable=False)
     kioskoid = Column(Integer, ForeignKey("kioskos.kioskoid"), nullable=False)
     ownerid = Column(Integer, ForeignKey("owners.ownerid"), nullable=False)
@@ -285,16 +286,16 @@ class ContractsKioskos(Base):
     contractid = Column(Integer, ForeignKey("contracts.contractid"))
     kioskoid = Column(Integer, ForeignKey("kioskos.kioskoid"), nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
-    posttime = Column(DateTime, nullable=False)
+    posttime = Column(DateTime, nullable=False, server_default=func.now())
 
-class PermisoPorUsuraio(Base):
+class PermisoPorUsuario(Base):
     __tablename__ = "permisoPorUsuario"
-    permisoPorUusarioid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    permisoPorUsuarioid = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     permisoid = Column(Integer, ForeignKey("permisos.permisoid"), nullable=False)
     usuarioid = Column(Integer, ForeignKey("usuarios.usuarioid"), nullable=False)
     created_at = Column(DateTime, nullable=False)
     deleted = Column(Boolean, default=False, nullable=False)
-    postTime = Column(DateTime, nullable=False)
+    postTime = Column(DateTime, nullable=False, server_default=func.now())
 
 class Addresses(Base):
     __tablename__ = "addresses"
@@ -306,13 +307,13 @@ class Addresses(Base):
     direccion1 = Column(VARCHAR(45), nullable=False)
     direccion2 = Column(VARCHAR(45))
     deleted = Column(Boolean,default=False, nullable=False)
-    postTime = Column(DateTime, nullable=False)
+    postTime = Column(DateTime, nullable=False, server_default=func.now())
 
 class Cities(Base):
     __tablename__ = "cities"
     cityid = Column(Integer, primary_key= True, autoincrement=True, nullable=False)
     cityName = Column(VARCHAR(100), nullable=False)
-    statedid = Column(Integer, ForeignKey("states.stateid"))
+    stateid = Column(Integer, ForeignKey("states.stateid"))
 
 class States(Base):
     __tablename__ = "states"

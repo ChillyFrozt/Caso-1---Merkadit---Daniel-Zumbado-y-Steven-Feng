@@ -1,4 +1,6 @@
-from services.sales_service import SalesService
+from ..services.products_service import ProductsService
+from ..services.sales_service  import SalesService
+
 
 class SalesController:
     def __init__(self, service: SalesService | None = None):

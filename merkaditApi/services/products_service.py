@@ -1,12 +1,11 @@
-# merkaditApi/services/products_service.py
-print(">> Cargando services/products_service.py")  # debug visible en consola
-
+# products_service.py
 from typing import List, Dict, Any
-from repositories.products_repository import ProductsRepository
+from ..repositories.products_repository import ProductsRepository
+from ..repositories.sales_repository    import SalesRepository
+
 
 class ProductsService:
     def __init__(self, repo: ProductsRepository | None = None):
-        # usamos la clase (estática) del repositorio directamente
         self.repo = repo or ProductsRepository
 
     def list_products(self, db) -> List[Dict[str, Any]]:
@@ -19,8 +18,10 @@ class ProductsService:
         return row
 
     def create_product(self, db, data: Dict[str, Any]) -> Dict[str, Any]:
-        if data["productoPrecio"] < 0 or data["productoCantidad"] < 0:
-            raise ValueError("precio y/o cantidad inválidos")
+        if data.get("productoPrecio", 0) < 0:
+            raise ValueError("precio inválido")
+        if data.get("productoCantidad", 0) < 0:
+            raise ValueError("cantidad inválida")
         return self.repo.create(db, data)
 
     def update_product(self, db, product_id: int, data: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
-from database import get_db
-from controllers.products_controller import ProductsController
-from schemas import ProductoCreate, ProductoUpdate, ProductoRead
+from ..database import get_db                     
+from ..controllers.products_controller import ProductsController  
+from ..schemas import ProductoCreate, ProductoUpdate, ProductoRead
+from typing import List 
+
+
+router = APIRouter()
 
 router = APIRouter()
 
@@ -15,7 +18,7 @@ def get_product(product_id: int, db = Depends(get_db)):
     try:
         return ProductsController().get(db, product_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
 
 @router.post("/", response_model=ProductoRead, status_code=status.HTTP_201_CREATED)
 def create_product(payload: ProductoCreate, db = Depends(get_db)):
@@ -37,4 +40,5 @@ def delete_product(product_id: int, db = Depends(get_db)):
         ProductsController().delete(db, product_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 

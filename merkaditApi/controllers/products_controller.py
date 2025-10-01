@@ -1,7 +1,6 @@
-print(">> Cargando controllers/products_controller.py")  # debug
+from ..services.products_service import ProductsService
+from ..schemas import ProductoCreate, ProductoUpdate, ProductoRead
 
-from services.products_service import ProductsService
-from schemas import ProductoCreate, ProductoUpdate
 
 class ProductsController:
     def __init__(self, service: ProductsService | None = None):

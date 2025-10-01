@@ -1,18 +1,17 @@
+# sales_service.py
+from ..repositories.products_repository import ProductsRepository
+from ..repositories.sales_repository    import SalesRepository
 
-from typing import Any, Dict
-from repositories.sales_repository import SalesRepository
 
 class SalesService:
     def __init__(self, repo: SalesRepository | None = None):
-        self.repo = repo or SalesRepository
+        # el repo usa métodos estáticos; aceptar instancia también está bien
+        self.repo = repo or SalesRepository()
 
-    def register_sale(self, db, payload: Dict[str, Any]):
-        for req in ("productoName","comercioName","cantidad","monto_pagado","medio_pago_name"):
-            if req not in payload:
-                raise ValueError(f"Falta campo requerido: {req}")
+    def register_sale(self, db, payload: dict):
         return self.repo.call_register_sale(db, payload)
 
-    def settle_commerce(self, db, payload: Dict[str, Any]):
-        if "comercioName" not in payload:
-            raise ValueError("Falta comercioName")
+    def settle_commerce(self, db, payload: dict):
         return self.repo.call_settle_commerce(db, payload)
+
+
